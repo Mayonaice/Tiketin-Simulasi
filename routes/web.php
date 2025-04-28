@@ -16,27 +16,26 @@ Route::middleware(['auth'])->group(function () {
 
     // Admin Routes
     Route::middleware([\App\Http\Middleware\CheckRole::class.':admin'])->group(function () {
-        Route::get('/admin/users', function () {
-            return view('admin.users');
-        })->name('admin.users');
-        Route::get('/admin/reports', function () {
-            return view('admin.reports');
-        })->name('admin.reports');
+        Route::get('/admin/reports', [App\Http\Controllers\Admin\ReportController::class, 'index'])->name('admin.reports');
+        Route::get('/admin/reports/sales', [App\Http\Controllers\Admin\ReportController::class, 'sales'])->name('admin.reports.sales');
+        Route::get('/admin/reports/export-sales', [App\Http\Controllers\Admin\ReportController::class, 'exportSales'])->name('admin.reports.export-sales');
+        Route::get('/admin/reports/airlines', [App\Http\Controllers\Admin\ReportController::class, 'airlines'])->name('admin.reports.airlines');
+        Route::get('/admin/reports/users', [App\Http\Controllers\Admin\ReportController::class, 'users'])->name('admin.reports.users');
+        
         // Approval Pembayaran oleh Admin
         Route::get('/payment/approvals', [App\Http\Controllers\PaymentApprovalController::class, 'index'])->name('payment.approvals');
         Route::get('/payment/show/{id}', [App\Http\Controllers\PaymentApprovalController::class, 'show'])->name('payment.show');
         Route::post('/payment/approve/{id}', [App\Http\Controllers\PaymentApprovalController::class, 'approve'])->name('payment.approve');
         Route::post('/payment/reject/{id}', [App\Http\Controllers\PaymentApprovalController::class, 'reject'])->name('payment.reject');
+        
+        // User Management
+        Route::resource('admin/users', App\Http\Controllers\Admin\UserManagementController::class, ['as' => 'admin']);
     });
 
     // Petugas Routes
     Route::middleware([\App\Http\Middleware\CheckRole::class.':petugas'])->group(function () {
-        Route::get('/petugas/tickets', function () {
-            return view('petugas.tickets');
-        })->name('petugas.tickets');
-        Route::get('/petugas/transactions', function () {
-            return view('petugas.transactions');
-        })->name('petugas.transactions');
+        Route::get('/petugas/tickets', [App\Http\Controllers\PetugasController::class, 'tickets'])->name('petugas.tickets');
+        Route::get('/petugas/transactions', [App\Http\Controllers\PetugasController::class, 'transactions'])->name('petugas.transactions');
 
         // CRUD Maskapai
         Route::resource('maskapai', App\Http\Controllers\MaskapaiController::class);

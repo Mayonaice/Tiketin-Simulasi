@@ -52,20 +52,7 @@
                 </div>
 
                 <!-- Role -->
-                <div>
-                    <label for="role" class="block text-sm font-medium text-gray-700">
-                        Daftar Sebagai
-                    </label>
-                    <div class="mt-1">
-                        <select id="role" name="role" required
-                            class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                            <option value="">Pilih Role</option>
-                            <option value="petugas" {{ old('role') == 'petugas' ? 'selected' : '' }}>Petugas</option>
-                            <option value="user" {{ old('role') == 'user' ? 'selected' : '' }}>User</option>
-                        </select>
-                        <x-input-error :messages="$errors->get('role')" class="mt-2" />
-                    </div>
-        </div>
+                <input type="hidden" name="role" value="user">
 
         <!-- Password -->
                 <div>

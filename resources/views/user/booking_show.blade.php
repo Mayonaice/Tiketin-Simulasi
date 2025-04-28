@@ -24,6 +24,7 @@
                     {{ ucfirst($transaksi->tiket->status) }}
                 </span>
             </div>
+            <div><b>Jumlah Tiket:</b> {{ $transaksi->quantity ?? 1 }}</div>
         </div>
     </div>
     
@@ -37,6 +38,26 @@
             <div><b>Berangkat:</b> {{ $transaksi->tiket->jadwal->jam_berangkat }}</div>
             <div><b>Tiba:</b> {{ $transaksi->tiket->jadwal->jam_tiba }}</div>
             <div><b>Harga Tiket:</b> Rp {{ number_format($transaksi->tiket->jadwal->harga_tiket,0,',','.') }}</div>
+        </div>
+    </div>
+    
+    <div class="mb-8">
+        <h3 class="text-lg font-semibold mb-2">Rincian Pembayaran</h3>
+        <div class="bg-blue-50 p-4 rounded">
+            <div class="flex justify-between items-center mb-2">
+                <div>Harga per Tiket</div>
+                <div>Rp {{ number_format($transaksi->tiket->jadwal->harga_tiket,0,',','.') }}</div>
+            </div>
+            <div class="flex justify-between items-center mb-2">
+                <div>Jumlah Tiket</div>
+                <div>{{ $transaksi->quantity ?? 1 }} tiket</div>
+            </div>
+            <div class="flex justify-between items-center pt-2 border-t border-blue-200">
+                <div class="font-semibold">Total Pembayaran</div>
+                <div class="text-lg font-bold text-blue-600">
+                    Rp {{ number_format($transaksi->total_price ?? ($transaksi->tiket->jadwal->harga_tiket * ($transaksi->quantity ?? 1)),0,',','.') }}
+                </div>
+            </div>
         </div>
     </div>
     

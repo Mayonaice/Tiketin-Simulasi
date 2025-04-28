@@ -30,6 +30,27 @@
                     <div><b>Harga Tiket:</b> Rp {{ number_format($jadwal->harga_tiket,0,',','.') }}</div>
                     <div><b>Sisa Kursi:</b> {{ $jadwal->sisa_kursi }}</div>
                 </div>
+
+                <div class="mt-4 mb-4">
+                    <label for="quantity" class="block text-sm font-medium text-gray-700 mb-1">Jumlah Tiket</label>
+                    <div class="flex items-center">
+                        <button type="button" id="decreaseBtn" class="px-3 py-1 border border-gray-300 rounded-l bg-gray-100 hover:bg-gray-200">-</button>
+                        <input type="number" id="quantity" name="quantity" value="1" min="1" max="{{ $jadwal->sisa_kursi }}" class="w-20 text-center border-t border-b border-gray-300 py-1" readonly>
+                        <button type="button" id="increaseBtn" class="px-3 py-1 border border-gray-300 rounded-r bg-gray-100 hover:bg-gray-200">+</button>
+                    </div>
+                </div>
+
+                <div class="mt-4 mb-4 bg-blue-50 p-4 rounded">
+                    <div class="text-lg font-semibold">Total Pembayaran</div>
+                    <div class="flex justify-between items-center mt-2">
+                        <div>
+                            <span id="ticketCount">1</span> x Rp {{ number_format($jadwal->harga_tiket,0,',','.') }}
+                        </div>
+                        <div class="text-xl font-bold text-blue-600">
+                            Rp <span id="totalPrice">{{ number_format($jadwal->harga_tiket,0,',','.') }}</span>
+                        </div>
+                    </div>
+                </div>
                 
                 <div class="flex justify-end space-x-2">
                     <a href="{{ route('booking.index') }}" class="py-2 px-4 bg-gray-200 rounded">Batal</a>
@@ -42,4 +63,52 @@
         </div>
     </form>
 </div>
+
+@if($jadwal)
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const decreaseBtn = document.getElementById('decreaseBtn');
+        const increaseBtn = document.getElementById('increaseBtn');
+        const quantityInput = document.getElementById('quantity');
+        const ticketCount = document.getElementById('ticketCount');
+        const totalPrice = document.getElementById('totalPrice');
+        const ticketPrice = {{ $jadwal->harga_tiket }};
+        const maxTickets = {{ $jadwal->sisa_kursi }};
+        
+        // Format number to Indonesian Rupiah format
+        function formatRupiah(number) {
+            return new Intl.NumberFormat('id-ID').format(number);
+        }
+        
+        // Update total price calculation
+        function updateTotalPrice() {
+            const quantity = parseInt(quantityInput.value);
+            const total = quantity * ticketPrice;
+            ticketCount.textContent = quantity;
+            totalPrice.textContent = formatRupiah(total);
+        }
+        
+        // Decrease button
+        decreaseBtn.addEventListener('click', function() {
+            const currentValue = parseInt(quantityInput.value);
+            if (currentValue > 1) {
+                quantityInput.value = currentValue - 1;
+                updateTotalPrice();
+            }
+        });
+        
+        // Increase button
+        increaseBtn.addEventListener('click', function() {
+            const currentValue = parseInt(quantityInput.value);
+            if (currentValue < maxTickets) {
+                quantityInput.value = currentValue + 1;
+                updateTotalPrice();
+            }
+        });
+        
+        // Initialize
+        updateTotalPrice();
+    });
+</script>
+@endif
 @endsection 

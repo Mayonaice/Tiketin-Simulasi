@@ -170,7 +170,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
             $container = $this->container ?? $this->preBoot();
 
             if ($container->has('http_cache')) {
-                return $container->get('http_cache')->handle($request, $type, $catch);
+                return $container->get('http_cache')-:handle($request, $type, $catch);
             }
         }
 

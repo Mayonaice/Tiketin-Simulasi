@@ -192,6 +192,23 @@
                     </div>
                 </div>
 
+                <!-- Price Info -->
+                <div class="mb-6 border-t border-gray-200 pt-4">
+                    <h3 class="text-sm font-semibold text-gray-700 mb-2">Informasi Pembayaran</h3>
+                    <div class="flex justify-between items-center mb-2">
+                        <p class="text-sm">Harga per Tiket</p>
+                        <p class="text-sm font-medium">Rp {{ number_format($transaksi->tiket->jadwal->harga_tiket,0,',','.') }}</p>
+                    </div>
+                    <div class="flex justify-between items-center mb-2">
+                        <p class="text-sm">Jumlah Tiket</p>
+                        <p class="text-sm font-medium">{{ $transaksi->quantity ?? 1 }} tiket</p>
+                    </div>
+                    <div class="flex justify-between items-center pt-2 border-t border-gray-200">
+                        <p class="text-sm font-semibold">Total Pembayaran</p>
+                        <p class="text-base font-bold text-blue-600">Rp {{ number_format($transaksi->total_price ?? ($transaksi->tiket->jadwal->harga_tiket * ($transaksi->quantity ?? 1)),0,',','.') }}</p>
+                    </div>
+                </div>
+
                 <!-- Barcode -->
                 <div class="border-t border-gray-200 pt-4 text-center">
                     <div class="mb-2">

@@ -66,12 +66,16 @@
                             <div class="flex justify-between">
                                 <span class="text-gray-600">Total Pembayaran:</span>
                                 <span class="font-medium text-blue-600">
-                                    @if(isset($transaksi->total_bayar))
-                                        Rp {{ number_format($transaksi->total_bayar, 0, ',', '.') }}
-                                    @else
-                                        Rp {{ number_format($transaksi->tiket->jadwal->harga_tiket ?? 0, 0, ',', '.') }}
-                                    @endif
+                                    Rp {{ number_format($transaksi->total_price ?? ($transaksi->tiket->jadwal->harga_tiket * ($transaksi->quantity ?? 1)), 0, ',', '.') }}
                                 </span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Jumlah Tiket:</span>
+                                <span class="font-medium">{{ $transaksi->quantity ?? 1 }} tiket</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Harga Per Tiket:</span>
+                                <span class="font-medium">Rp {{ number_format($transaksi->tiket->jadwal->harga_tiket, 0, ',', '.') }}</span>
                             </div>
                             <div class="flex justify-between">
                                 <span class="text-gray-600">Tanggal Pembayaran:</span>

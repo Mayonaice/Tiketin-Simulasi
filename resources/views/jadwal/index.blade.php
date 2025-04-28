@@ -44,7 +44,7 @@
                                     <svg class="w-4 h-4 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 22h14a2 2 0 002-2V9a1 1 0 00-1-1h-3v-.5a2.5 2.5 0 00-5 0V8H8a1 1 0 00-1 1v11a2 2 0 002 2z"></path>
                                     </svg>
-                                    {{ $jadwal->maskapai->nama }}
+                                    {{ $jadwal->maskapai->nama_maskapai }}
                                 </div>
                             </td>
                             <td class="py-4 px-6">
@@ -53,7 +53,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                     </svg>
-                                    {{ $jadwal->kotaAsal->nama }}
+                                    {{ $jadwal->kotaAsal->nama_kota }}
                                 </div>
                             </td>
                             <td class="py-4 px-6">
@@ -62,7 +62,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                     </svg>
-                                    {{ $jadwal->kotaTujuan->nama }}
+                                    {{ $jadwal->kotaTujuan->nama_kota }}
                                 </div>
                             </td>
                             <td class="py-4 px-6">

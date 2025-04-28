@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Transaksi;
 use App\Models\Tiket;
+use App\Models\JadwalPenerbangan;
 
 class PaymentApprovalController extends Controller
 {
@@ -74,9 +75,25 @@ class PaymentApprovalController extends Controller
         $transaksi = Transaksi::findOrFail($id);
         $tiket = Tiket::findOrFail($transaksi->tiket_id);
         
-        // Update status
+        // Update transaksi status
         $transaksi->update(['status_bayar' => 'approved']);
-        $tiket->update(['status' => 'terjual']);
+        
+        // Update status for multiple tickets if quantity > 1
+        $jadwal = JadwalPenerbangan::findOrFail($tiket->jadwal_id);
+        $quantity = $transaksi->quantity ?? 1;
+        
+        // Find all tickets with the same jadwal_id and status 'dipesan' (limit to quantity)
+        $tikets = Tiket::where('jadwal_id', $tiket->jadwal_id)
+                      ->where('status', 'dipesan')
+                      ->take($quantity)
+                      ->get();
+                      
+        foreach ($tikets as $t) {
+            $t->update(['status' => 'terjual']);
+        }
+        
+        // Update sisa kursi setelah pembayaran disetujui
+        $jadwal->decrement('sisa_kursi', $quantity);
         
         return redirect()->route('payment.approvals')->with('success', 'Pembayaran berhasil diapprove!');
     }
@@ -88,10 +105,24 @@ class PaymentApprovalController extends Controller
     {
         $transaksi = Transaksi::findOrFail($id);
         $tiket = Tiket::findOrFail($transaksi->tiket_id);
+        $jadwal = JadwalPenerbangan::findOrFail($tiket->jadwal_id);
         
-        // Update status
+        // Get quantity
+        $quantity = $transaksi->quantity ?? 1;
+        
+        // Update transaksi status
         $transaksi->update(['status_bayar' => 'pending']);
-        $tiket->update(['status' => 'dipesan']);
+        
+        // Find tickets with jadwal_id and 'dipesan' status
+        $tikets = Tiket::where('jadwal_id', $tiket->jadwal_id)
+                      ->where('status', 'dipesan')
+                      ->take($quantity)
+                      ->get();
+        
+        // Return tickets to 'tersedia' status
+        foreach ($tikets as $t) {
+            $t->update(['status' => 'tersedia']);
+        }
         
         return redirect()->route('payment.approvals')->with('success', 'Pembayaran ditolak dan dikembalikan ke status menunggu pembayaran!');
     }

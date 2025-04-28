@@ -1,0 +1,1 @@
+tolong pada saat pesan tiket di user, dapat memilih jumlah tiket yang ingin dipesan, dan dapat langsung mentotalkan harganya, boleh menambahan struktur baru pada table namun setelah itu analisa semua file dan edit juga file yang berdampak pada perubahan struktur tersebut, dengan catatan terakhit, design ui harus sama dengan template

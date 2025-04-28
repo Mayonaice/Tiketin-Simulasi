@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\JadwalPenerbangan;
 use App\Models\Tiket;
 use App\Models\Transaksi;
+use App\Models\Kota;
+use App\Models\Maskapai;
 use Illuminate\Support\Facades\Auth;
 
 class UserBookingController extends Controller
@@ -13,10 +15,46 @@ class UserBookingController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $jadwals = JadwalPenerbangan::with(['maskapai', 'kotaAsal', 'kotaTujuan'])->where('sisa_kursi', '>', 0)->get();
-        return view('user.booking_index', compact('jadwals'));
+        $query = JadwalPenerbangan::with(['maskapai', 'kotaAsal', 'kotaTujuan'])->where('sisa_kursi', '>', 0);
+        
+        // Filter by kota asal (berangkat)
+        if ($request->has('kota_asal') && $request->kota_asal != '') {
+            $query->where('kota_asal_id', $request->kota_asal);
+        }
+        
+        // Filter by kota tujuan
+        if ($request->has('kota_tujuan') && $request->kota_tujuan != '') {
+            $query->where('kota_tujuan_id', $request->kota_tujuan);
+        }
+        
+        // Filter by maskapai
+        if ($request->has('maskapai') && $request->maskapai != '') {
+            $query->where('maskapai_id', $request->maskapai);
+        }
+        
+        // Filter by tanggal/jadwal
+        if ($request->has('tanggal') && $request->tanggal != '') {
+            $query->whereDate('tanggal_berangkat', $request->tanggal);
+        }
+        
+        // Filter by harga (range)
+        if ($request->has('harga_min') && $request->harga_min != '') {
+            $query->where('harga_tiket', '>=', $request->harga_min);
+        }
+        
+        if ($request->has('harga_max') && $request->harga_max != '') {
+            $query->where('harga_tiket', '<=', $request->harga_max);
+        }
+        
+        $jadwals = $query->get();
+        
+        // Get data for filter dropdowns
+        $kotas = Kota::all();
+        $maskapais = Maskapai::all();
+        
+        return view('user.booking_index', compact('jadwals', 'kotas', 'maskapais', 'request'));
     }
 
     /**
@@ -35,21 +73,46 @@ class UserBookingController extends Controller
     {
         $request->validate([
             'jadwal_id' => 'required|exists:jadwal_penerbangans,id',
+            'quantity' => 'required|integer|min:1',
         ]);
+        
         $jadwal = JadwalPenerbangan::findOrFail($request->jadwal_id);
-        $tiket = Tiket::where('jadwal_id', $jadwal->id)->where('status', 'tersedia')->first();
-        if (!$tiket) {
-            return back()->with('error', 'Tiket sudah habis!');
+        
+        // Validasi jumlah tiket tidak melebihi sisa kursi
+        if ($request->quantity > $jadwal->sisa_kursi) {
+            return back()->with('error', 'Jumlah tiket yang diminta melebihi sisa kursi yang tersedia!');
         }
+        
+        // Cari tiket yang tersedia
+        $tikets = Tiket::where('jadwal_id', $jadwal->id)
+                        ->where('status', 'tersedia')
+                        ->take($request->quantity)
+                        ->get();
+                        
+        if ($tikets->count() < $request->quantity) {
+            return back()->with('error', 'Tiket tidak cukup tersedia!');
+        }
+        
+        // Hitung total harga
+        $total_price = $jadwal->harga_tiket * $request->quantity;
+        
+        // Ambil tiket pertama untuk referensi transaksi
+        $first_tiket = $tikets->first();
+        
         // Buat transaksi
         $transaksi = Transaksi::create([
             'user_id' => Auth::id(),
-            'tiket_id' => $tiket->id,
+            'tiket_id' => $first_tiket->id,
+            'quantity' => $request->quantity,
+            'total_price' => $total_price,
             'status_bayar' => 'pending',
         ]);
-        // Update tiket & sisa kursi
-        $tiket->update(['status' => 'dipesan']);
-        $jadwal->decrement('sisa_kursi');
+        
+        // Update status tiket
+        foreach ($tikets as $tiket) {
+            $tiket->update(['status' => 'dipesan']);
+        }
+        
         return redirect()->route('booking.edit', $transaksi->id)->with('success', 'Tiket berhasil dipesan, silakan upload bukti pembayaran!');
     }
 
