@@ -1,5 +1,9 @@
 @extends('layouts.dashboard')
 
+@php
+use Illuminate\Support\Facades\Storage;
+@endphp
+
 @section('content')
 <div class="space-y-6">
     <div class="bg-white rounded-lg shadow-lg overflow-hidden">
@@ -166,9 +170,13 @@
                             <div class="w-full md:w-1/4 mb-4 md:mb-0">
                                 <div class="flex flex-col items-center md:items-start">
                                     <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-2">
+                                        @if($jadwal->maskapai->logo_path)
+                                            <img src="{{ Storage::url($jadwal->maskapai->logo_path) }}" alt="{{ $jadwal->maskapai->nama_maskapai }}" class="h-10 w-auto" onerror="this.src='{{ asset('images/no-image.png') }}'; this.onerror='';">
+                                        @else
                                         <svg class="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 22h14a2 2 0 002-2V9a1 1 0 00-1-1h-3v-.5a2.5 2.5 0 00-5 0V8H8a1 1 0 00-1 1v11a2 2 0 002 2z"></path>
                                         </svg>
+                                        @endif
                                     </div>
                                     <div class="text-center md:text-left">
                                         <h4 class="font-bold text-gray-800">{{ $jadwal->maskapai->nama_maskapai }}</h4>

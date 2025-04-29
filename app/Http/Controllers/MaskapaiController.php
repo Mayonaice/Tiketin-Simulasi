@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Maskapai;
+use Illuminate\Support\Facades\Storage;
 
 class MaskapaiController extends Controller
 {
@@ -32,8 +33,18 @@ class MaskapaiController extends Controller
         $request->validate([
             'nama_maskapai' => 'required|string|max:100',
             'kode_maskapai' => 'required|string|max:10|unique:maskapais,kode_maskapai',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
-        Maskapai::create($request->only(['nama_maskapai', 'kode_maskapai']));
+        
+        $data = $request->only(['nama_maskapai', 'kode_maskapai']);
+        
+        // Handle file upload
+        if ($request->hasFile('logo')) {
+            $path = $request->file('logo')->store('maskapai_logos', 'public');
+            $data['logo_path'] = $path;
+        }
+        
+        Maskapai::create($data);
         return redirect()->route('maskapai.index')->with('success', 'Maskapai berhasil ditambahkan!');
     }
 
@@ -63,9 +74,25 @@ class MaskapaiController extends Controller
         $request->validate([
             'nama_maskapai' => 'required|string|max:100',
             'kode_maskapai' => 'required|string|max:10|unique:maskapais,kode_maskapai,' . $maskapai->id,
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
-        $maskapai->update($request->only(['nama_maskapai', 'kode_maskapai']));
-        //
+        
+        $data = $request->only(['nama_maskapai', 'kode_maskapai']);
+        
+        // Handle file upload
+        if ($request->hasFile('logo')) {
+            // Delete old logo if exists
+            if ($maskapai->logo_path && Storage::disk('public')->exists($maskapai->logo_path)) {
+                Storage::disk('public')->delete($maskapai->logo_path);
+            }
+            
+            // Upload new logo
+            $path = $request->file('logo')->store('maskapai_logos', 'public');
+            $data['logo_path'] = $path;
+        }
+        
+        $maskapai->update($data);
+        return redirect()->route('maskapai.index')->with('success', 'Maskapai berhasil diperbarui!');
     }
 
     /**
@@ -73,6 +100,14 @@ class MaskapaiController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $maskapai = Maskapai::findOrFail($id);
+        
+        // Delete logo file if exists
+        if ($maskapai->logo_path && Storage::disk('public')->exists($maskapai->logo_path)) {
+            Storage::disk('public')->delete($maskapai->logo_path);
+        }
+        
+        $maskapai->delete();
+        return redirect()->route('maskapai.index')->with('success', 'Maskapai berhasil dihapus!');
     }
 }

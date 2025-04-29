@@ -153,7 +153,7 @@
     <div class="bg-white rounded-lg shadow-md overflow-hidden mb-6">
         <div class="bg-gradient-to-r from-blue-600 to-sky-400 py-4 px-6 flex justify-between items-center">
             <h2 class="text-xl font-bold text-white">Daftar Transaksi</h2>
-            <a href="{{ route('admin.reports.sales.export', request()->all()) }}" class="bg-white hover:bg-gray-100 text-blue-700 font-semibold py-2 px-4 rounded-md shadow-sm transition-colors flex items-center">
+            <a href="{{ route('admin.reports.export-sales', request()->all()) }}" class="bg-white hover:bg-gray-100 text-blue-700 font-semibold py-2 px-4 rounded-md shadow-sm transition-colors flex items-center">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                 </svg>

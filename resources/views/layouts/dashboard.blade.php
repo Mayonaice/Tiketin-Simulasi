@@ -41,12 +41,32 @@
             cursor: pointer;
             display: inline-flex;
             align-items: center;
+            padding-top: 0.25rem !important;
+            padding-bottom: 0.25rem !important;
+            height: auto;
         }
         .group button svg {
             transition: transform 0.2s;
         }
         .group:hover button svg {
             transform: rotate(180deg);
+        }
+        /* Fixed height for dropdown button to match other nav links */
+        .dropdown-btn {
+            height: 16px !important;
+            line-height: 16px !important;
+            margin-top: auto;
+            margin-bottom: auto;
+            display: inline-flex;
+            align-items: center;
+            padding-top: 1px !important; 
+            padding-bottom: 1px !important;
+        }
+        /* Ensure consistent vertical alignment across all nav items */
+        .nav-items-container {
+            height: 100%;
+            display: flex;
+            align-items: center;
         }
     </style>
 </head>
@@ -68,16 +88,55 @@
                         </div>
 
                         <!-- Navigation Links -->
-                        <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                        <div class="hidden sm:ml-6 sm:flex sm:space-x-8 nav-items-container">
                             <a href="{{ route('dashboard') }}" class="nav-link text-white inline-flex items-center px-1 pt-1 text-sm font-medium">
                                 Dashboard
                             </a>
                             @if(auth()->user()->isAdmin())
+                                <div class="relative group flex items-center h-16 dropdown-container">
+                                    <button class="nav-link dropdown-btn text-white inline-flex items-center px-1 text-sm font-medium">
+                                        <svg class="h-5 w-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                        </svg>
+                                        Master Data
+                                        <svg class="h-4 w-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </button>
+                                    <div class="absolute w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 hidden group-hover:block z-10" style="transform: translate(0, 64px);">
+                                        <div>
+                                            <a href="{{ route('admin.maskapai.index') }}" class="block text-sm text-gray-700 hover:bg-blue-50" style="padding: 8px 16px; line-height: 1.5;">
+                                                Maskapai
+                                            </a>
+                                            <a href="{{ route('admin.kota.index') }}" class="block text-sm text-gray-700 hover:bg-blue-50" style="padding: 8px 16px; line-height: 1.5;">
+                                                Kota
+                                            </a>
+                                            <a href="{{ route('admin.jadwal.index') }}" class="block text-sm text-gray-700 hover:bg-blue-50" style="padding: 8px 16px; line-height: 1.5;">
+                                                Jadwal Penerbangan
+                                            </a>
+                                            <a href="{{ route('admin.tiket.index') }}" class="block text-sm text-gray-700 hover:bg-blue-50" style="padding: 8px 16px; line-height: 1.5;">
+                                                Tiket
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="{{ route('admin.tickets') }}" class="nav-link text-white inline-flex items-center px-1 pt-1 text-sm font-medium">
+                                    <svg class="h-5 w-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+                                    </svg>
+                                    Monitoring
+                                </a>
                                 <a href="{{ route('payment.approvals') }}" class="nav-link text-white inline-flex items-center px-1 pt-1 text-sm font-medium">
                                     <svg class="h-5 w-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
-                                    Approval Pembayaran
+                                    Approval Payment
+                                </a>
+                                <a href="{{ route('admin.history') }}" class="nav-link text-white inline-flex items-center px-1 pt-1 text-sm font-medium">
+                                    <svg class="h-5 w-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    Riwayat Pemesanan
                                 </a>
                                 <a href="{{ route('admin.users.index') }}" class="nav-link text-white inline-flex items-center px-1 pt-1 text-sm font-medium">
                                     <svg class="h-5 w-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -93,8 +152,8 @@
                                 </a>
                             @endif
                             @if(auth()->user()->isPetugas())
-                                <div class="relative group">
-                                    <button class="nav-link text-white inline-flex items-center px-1 pt-1 text-sm font-medium">
+                                <div class="relative group flex items-center h-16 dropdown-container">
+                                    <button class="nav-link dropdown-btn text-white inline-flex items-center px-1 text-sm font-medium">
                                         <svg class="h-5 w-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                                         </svg>
@@ -103,18 +162,18 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                         </svg>
                                     </button>
-                                    <div class="absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 hidden group-hover:block z-10">
-                                        <div class="py-1">
-                                            <a href="{{ route('maskapai.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50">
+                                    <div class="absolute w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 hidden group-hover:block z-10" style="transform: translate(0, 64px);">
+                                        <div>
+                                            <a href="{{ route('maskapai.index') }}" class="block text-sm text-gray-700 hover:bg-blue-50" style="padding: 8px 16px; line-height: 1.5;">
                                                 Maskapai
                                             </a>
-                                            <a href="{{ route('kota.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50">
+                                            <a href="{{ route('kota.index') }}" class="block text-sm text-gray-700 hover:bg-blue-50" style="padding: 8px 16px; line-height: 1.5;">
                                                 Kota
                                             </a>
-                                            <a href="{{ route('jadwal.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50">
+                                            <a href="{{ route('jadwal.index') }}" class="block text-sm text-gray-700 hover:bg-blue-50" style="padding: 8px 16px; line-height: 1.5;">
                                                 Jadwal Penerbangan
                                             </a>
-                                            <a href="{{ route('tiket.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50">
+                                            <a href="{{ route('tiket.index') }}" class="block text-sm text-gray-700 hover:bg-blue-50" style="padding: 8px 16px; line-height: 1.5;">
                                                 Tiket
                                             </a>
                                         </div>
@@ -131,6 +190,18 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                                     </svg>
                                     Transaksi
+                                </a>
+                                <a href="{{ route('petugas.history') }}" class="nav-link text-white inline-flex items-center px-1 pt-1 text-sm font-medium">
+                                    <svg class="h-5 w-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    Riwayat Pemesanan
+                                </a>
+                                <a href="{{ route('users.index') }}" class="nav-link text-white inline-flex items-center px-1 pt-1 text-sm font-medium">
+                                    <svg class="h-5 w-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                                    </svg>
+                                    Manajemen User
                                 </a>
                             @endif
                             @if(auth()->user()->isUser())
@@ -168,7 +239,7 @@
                                     </div>
                                 </button>
                             </div>
-                            <div class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 hidden" role="menu" id="user-menu">
+                            <div class=" origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 hidden" role="menu" id="user-menu">
                                 <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50" role="menuitem">Profil</a>
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf

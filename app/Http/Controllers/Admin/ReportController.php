@@ -77,7 +77,7 @@ class ReportController extends Controller
         $topMaskapai = Maskapai::select(
                 'maskapais.id',
                 'maskapais.nama_maskapai as nama_maskapai',
-                DB::raw('COUNT(transaksis.id) as transaction_count')
+                DB::raw('SUM(COALESCE(transaksis.quantity, 1)) as transaction_count')
             )
             ->join('jadwal_penerbangans', 'maskapais.id', '=', 'jadwal_penerbangans.maskapai_id')
             ->join('tikets', 'jadwal_penerbangans.id', '=', 'tikets.jadwal_id')
@@ -269,15 +269,15 @@ class ReportController extends Controller
                 'maskapais.id',
                 'maskapais.nama_maskapai as name',
                 DB::raw('COUNT(DISTINCT transaksis.id) as transaction_count'),
-                DB::raw('SUM(jadwal_penerbangans.harga_tiket) as total_revenue'),
-                DB::raw('COUNT(DISTINCT tikets.id) as ticket_count')
+                DB::raw('SUM(jadwal_penerbangans.harga_tiket * COALESCE(transaksis.quantity, 1)) as total_revenue'),
+                DB::raw('SUM(COALESCE(transaksis.quantity, 1)) as ticket_count')
             )
             ->join('jadwal_penerbangans', 'maskapais.id', '=', 'jadwal_penerbangans.maskapai_id')
             ->join('tikets', 'jadwal_penerbangans.id', '=', 'tikets.jadwal_id')
             ->join('transaksis', 'tikets.id', '=', 'transaksis.tiket_id')
             ->whereBetween('transaksis.created_at', [$startDateCarbon, $endDateCarbon])
             ->groupBy('maskapais.id', 'maskapais.nama_maskapai')
-            ->orderByDesc('transaction_count')
+            ->orderByDesc('ticket_count')
             ->paginate(10);
             
         // Get total metrics for percentages
@@ -285,12 +285,17 @@ class ReportController extends Controller
         $totalRevenue = Transaksi::join('tikets', 'transaksis.tiket_id', '=', 'tikets.id')
             ->join('jadwal_penerbangans', 'tikets.jadwal_id', '=', 'jadwal_penerbangans.id')
             ->whereBetween('transaksis.created_at', [$startDateCarbon, $endDateCarbon])
-            ->sum('jadwal_penerbangans.harga_tiket');
+            ->sum(DB::raw('jadwal_penerbangans.harga_tiket * COALESCE(transaksis.quantity, 1)'));
+        
+        // Get total ticket count based on quantity
+        $totalTickets = Transaksi::whereBetween('created_at', [$startDateCarbon, $endDateCarbon])
+            ->sum(DB::raw('COALESCE(quantity, 1)'));
         
         return view('admin.reports.airlines', compact(
             'airlines',
             'totalTransactions',
             'totalRevenue',
+            'totalTickets',
             'startDate',
             'endDate'
         ));
@@ -315,7 +320,7 @@ class ReportController extends Controller
                 'users.email',
                 'users.created_at as registered_at',
                 DB::raw('COUNT(transaksis.id) as transaction_count'),
-                DB::raw('SUM(jadwal_penerbangans.harga_tiket) as total_spent'),
+                DB::raw('SUM(jadwal_penerbangans.harga_tiket * COALESCE(transaksis.quantity, 1)) as total_spent'),
                 DB::raw('MAX(transaksis.created_at) as last_transaction_date')
             )
             ->leftJoin('transaksis', 'users.id', '=', 'transaksis.user_id')
